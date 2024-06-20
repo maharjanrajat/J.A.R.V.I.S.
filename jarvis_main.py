@@ -1,5 +1,8 @@
 import pyttsx3
 import speech_recognition
+import requests
+from bs4 import BeautifulSoup
+import datetime
 
 engine = pyttsx3.init("sapi5")
 voices = engine.getProperty("voices")
@@ -27,6 +30,13 @@ def takeCommand():
         return "None"
     return query
 
+def alarm(query):
+    timehere = open("alarmtext.txt","a")
+    timehere.write(query)
+    timehere.close()
+    os.startfile("alarm.py")
+    
+
 if __name__ == "__main__":
     while True:
         query = takeCommand().lower()
@@ -52,6 +62,66 @@ if __name__ == "__main__":
                 elif "thank you" in query:
                     speak("You're welcome, sir")
                     
-                elif "google" in query:
-                    from 
+                elif "open" in query:
+                    from dictApp import openappweb
+                    openappweb(query)
+                elif "close" in query:
+                    from dictApp import closeappweb
+                    closeappweb(query)
                     
+                
+                    
+                elif "google" in query:
+                    from SearchNow import searchGoogle
+                    searchGoogle(query)
+                
+                elif "youtube" in query:
+                    from SearchNow import searchYoutube
+                    searchYoutube(query)
+                    
+                elif "wikipedia" in query:
+                    from SearchNow import searchWikipedia
+                    searchWikipedia(query)
+                     
+                elif "temperature" in query:
+                    search = "temperature today..."
+                    url = f"https://www.google.com/search?q={search}"
+                    r = requests.get(url)
+                    data = BeautifulSoup(r.text, "html.parser")
+                    temp = data.find("div", class_ = "BNeawe").text
+                    speak(f"curresnt{search} is {temp}")
+                    
+                elif "weather" in query:
+                    search = "weather today..."
+                    url = f"https://www.google.com/search?q={search}"
+                    r = requests.get(url)
+                    data = BeautifulSoup(r.text, "html.parser")
+                    temp = data.find("div", class_ = "BNeawe").text
+                    speak(f"curresnt{search} is {temp}")
+                    
+                elif "the time" in query:
+                    strTime = datetime.datetime.now().strftime("%H:%M")
+                    speak(f"sir, the current time is {strTime}")
+                    
+                elif "set an alarm" in query:
+                    print("input time example: 10 and 10 and 10")
+                    speak("Set an alarm")
+                    a = input("Please tell the time:")
+                    alarm(a)
+                    speak("Alarm set successfully, sir")
+                    
+                elif "finally sleep" in query:
+                    speak("Okay sir, going to sleep!")
+                    exit()
+                    
+                elif "remember that" in query:
+                    rememberMessage = query.replace("remember that","")
+                    rememberMessage = query.replace("jarvis","")
+                    speak("You told me to.." + rememberMessage)
+                    remember = open("Remember.txt","w")
+                    remember.write(rememberMessage)
+                    remember.close()
+                    
+                elif "what do you remember jarvis?" in query:
+                    remember = open("Remember.txt","r")
+                    speak("You told me to.." + remember.read())                 
